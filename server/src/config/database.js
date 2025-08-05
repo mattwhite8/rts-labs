@@ -71,12 +71,16 @@ class Database {
     });
   }
 
-  run(sql, params = []) {
+  async ensureConnection() {
+    if (!this.isConnected()) {
+      await this.init();
+    }
+    return;
+  }
+
+  async run(sql, params = []) {
+    await this.ensureConnection();
     return new Promise((resolve, reject) => {
-      if (!this.isConnected()) {
-        reject(new Error("Database not connected"));
-        return;
-      }
       this.db.run(sql, params, function (err) {
         if (err) {
           console.error("Error running sql", sql, err);
@@ -88,12 +92,9 @@ class Database {
     });
   }
 
-  get(sql, params = []) {
+  async get(sql, params = []) {
+    await this.ensureConnection();
     return new Promise((resolve, reject) => {
-      if (!this.isConnected()) {
-        reject(new Error("Database not connected"));
-        return;
-      }
       this.db.get(sql, params, (err, row) => {
         if (err) {
           console.error("Error running sql", sql, err);
@@ -105,12 +106,9 @@ class Database {
     });
   }
 
-  all(sql, params = []) {
+  async all(sql, params = []) {
+    await this.ensureConnection();
     return new Promise((resolve, reject) => {
-      if (!this.isConnected()) {
-        reject(new Error("Database not connected"));
-        return;
-      }
       this.db.all(sql, params, (err, rows) => {
         if (err) {
           console.error("Error running sql", sql, err);
